@@ -4,12 +4,12 @@ import app from '../app.js';
 import http from 'http';
 import debug from 'debug';
 // import { Server } from 'socket.io';
-//import { initializeDbSchema } from '../config/db.js';
+import { initializeDbSchema } from '../config/db.js';
 import winstonLogger from '../utils/logger.js';
 // import connectToDb and initializeDbSchema if you're using them
 
 const logger = winstonLogger;
-const log = debug('api-booking:server')
+const log = debug('api_booking:server')
 
 const port = normalizePort(process.env.PORT || '3001');
 app.set('port', port);
@@ -36,7 +36,7 @@ const startServer = async () => {
   try {
     logger.info(`Attempting to start server on port ${port}`);
     
-    // await initializeDbSchema();
+    await initializeDbSchema();
 
     server.listen(port);
     server.on('error', onError);
