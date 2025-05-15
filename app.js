@@ -8,7 +8,7 @@ import morgan from 'morgan';
 // import timeSlotRoutes from './routes/timeSlot.js'
 import winstonLogger from './utils/logger.js'
 import indexRouter from'./routes/index.js';
-// import usersRouter from'./routes/users.js';
+import authRoutes from './routes/authRoutes.js';
 // import providerRouter from './routes/providers.js'
 // import appointmentRoutes from './routes/appointment.js'
 
@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-// app.use('/api/users', usersRouter);
+app.use('/api/auth', authRoutes);
 // app.use('/api/providers', providerRouter);
 // app.use('/api/time-slot', timeSlotRoutes);
 // app.use('/api/appointments', appointmentRoutes);

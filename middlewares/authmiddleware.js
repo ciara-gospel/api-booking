@@ -1,41 +1,35 @@
-// //middleware/authmiddleware.js
-// import jwt from 'jsonwebtoken';
-// import dotenv from 'dotenv';
+// middlewares/authMiddleware.js
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
-// dotenv.config();
+export const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token missing or invalid' });
+  }
 
-// // This is the authenticate middleware to verify the token
-// export const authenticate = (req, res, next) => {
-//   const authHeader = req.headers.authorization;
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // Contiendra userId, role, etc.
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Invalid token' });
+  }
+};
 
-//   if (!authHeader?.startsWith('Bearer ')) {
-//     return res.status(401).json({ message: 'Missing or invalid token' });
-//   }
+export const validateRegister = (req, res, next) => {
+  const { email, password, first_name, last_name } = req.body;
+  if (!email || !password || !first_name || !last_name) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+  next();
+};
 
-//   const token = authHeader.split(' ')[1];
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     req.user = decoded; // Attach user info (id, role, etc.) to request
-//     next();
-//   } catch (err) {
-//     res.status(403).json({ message: 'Invalid or expired token' });
-//   }
-// };
-
-// // This is the protect middleware to restrict access based on roles
-// export const protect = (roles = []) => {
-//   // Roles is an array of allowed roles for the route
-//   return (req, res, next) => {
-//     if (!req.user) {
-//       return res.status(401).json({ message: 'Unauthorized' });
-//     }
-
-//     // Check if the user's role is in the allowed roles
-//     if (!roles.includes(req.user.role)) {
-//       return res.status(403).json({ message: 'Forbidden: You do not have permission to access this route' });
-//     }
-
-//     next();
-//   };
-// };
+export const validateLogin = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+  next();
+};

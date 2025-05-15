@@ -1,8 +1,8 @@
 import express from 'express';
-// import { loginUser, registerUser } from '../controllers/userController.js';
-// import { validateRequest } from '../middleware/validateRequest.js';
-// import { loginSchema, registerSchema } from '../validator/userValidator.js';
+import {authenticate} from '../middlewares/authmiddleware.js';
 
 const router = express.Router();
-// router.post('/login', validateRequest(loginSchema), loginUser)
+router.get('/dashboard', authenticate, (req, res) => {
+  res.json({message: `Hello ${req.user.role} ${req.user.id}` });
+})
 export default router;
