@@ -10,7 +10,7 @@ import winstonLogger from './utils/logger.js'
 import indexRouter from'./routes/index.js';
 import authRoutes from './routes/authRoutes.js';
 import slotsRoutes from './routes/slots.js';
-// import providerRouter from './routes/providers.js'
+import appointmentRoutes from './routes/appointmentRoutes.js';
 // import appointmentRoutes from './routes/appointment.js'
 
 const app = express();
@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api/auth', authRoutes);
 app.use('/api', slotsRoutes);
-// app.use('/api/providers', providerRouter);
+app.use('/api/appointment', appointmentRoutes);
 // app.use('/api/time-slot', timeSlotRoutes);
 // app.use('/api/appointments', appointmentRoutes);
 
