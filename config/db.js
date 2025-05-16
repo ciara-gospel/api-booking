@@ -5,29 +5,30 @@ import "dotenv/config"
 
 const { Pool } = pg
 
-const {
-    DB_USER,
-    DB_PASSWORD,
-    DB_HOST,
-    DB_NAME,
-    DB_PORT,
-    DB_NAME_TEST,
-    NODE_ENV
-} = process.env
-
-if (!DB_HOST || !DB_PASSWORD || !DB_NAME || !DB_USER || !DB_PORT || !DB_NAME_TEST) {
-    logger.error("Database environment variable are missing! Check your .env file.")
-    process.exit(1)
+const { DB_USER,DB_PASSWORD,DB_HOST,DB_NAME,DB_PORT,DB_NAME_TEST,NODE_ENV} = process.env
+let pool;
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+  if (!DB_USER || !DB_HOST || !DB_PASSWORD || !DB_NAME || !DB_PORT) {
+    logger.error("Missing DB environment variables. Check your .env file");
+    process.exit(1);
+  }
+  pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database:
+      process.env.NODE_ENV === "test"
+        ? process.env.DB_NAME_TEST
+        : process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    connectionTimeoutMillis: 2000,
+  });
+} else {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    connectionTimeoutMillis: 2000,
+  });
 }
-
-const pool = new Pool({
-    user: DB_USER,
-    host: DB_HOST,
-    database: NODE_ENV === "test" ? DB_NAME_TEST : DB_NAME,
-    password: DB_PASSWORD,
-    port: parseInt(DB_PORT, 10),
-    connectionTimeoutMillis: 2000
-})
 logger.info(`Database is configured for: ${DB_NAME}`)
 
 pool.on("connect", (client) => {
