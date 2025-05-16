@@ -51,13 +51,14 @@ export const bookAppointment = async (req, res) => {
       appointment: appointmentRes.rows[0],
     });
   } catch (err) {
-    console.error("Booking error:", err);
+    console.error("Error in bookAppointment:", err);
     res.status(500).json({
       message: "Failed to book appointment",
       error: err.message,
     });
   }
 };
+
 
 export const getMyAppointments = async (req, res) => {
   const user_id = req.user.id;
@@ -70,6 +71,7 @@ export const getMyAppointments = async (req, res) => {
 
     res.status(200).json({ appointments: result.rows });
   } catch (err) {
+    console.error("Error in getMyAppointments:", err);
     res.status(500).json({ message: "Error fetching appointments", error: err.message });
   }
 };
@@ -85,6 +87,7 @@ export const getProviderAppointments = async (req, res) => {
 
     res.status(200).json({ appointments: result.rows });
   } catch (err) {
+    console.error("Error in getProviderAppointments:", err);
     res.status(500).json({ message: "Error fetching appointments", error: err.message });
   }
 };
@@ -129,6 +132,7 @@ export const cancelAppointment = async (req, res) => {
 
     res.status(200).json({ message: "Appointment canceled successfully" });
   } catch (err) {
+    console.error("Error in cancelAppointment:", err);
     res.status(500).json({ message: "Failed to cancel appointment", error: err.message });
   }
 };

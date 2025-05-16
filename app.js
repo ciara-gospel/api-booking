@@ -3,9 +3,8 @@ import path, { dirname } from'path';
 import cookieParser from'cookie-parser';
 import { fileURLToPath } from 'node:url';
 import morgan from 'morgan';
-// import swaggerUi from "swagger-ui-express"
-// import swaggerSpec from './swaggerConfig.js';
 import cors from 'cors';
+import { setupSwagger } from './swaggerConfig.js';
 import winstonLogger from './utils/logger.js'
 import indexRouter from'./routes/index.js';
 import authRoutes from './routes/authRoutes.js';
@@ -44,7 +43,11 @@ app.use((req, res, next) => {
   next(error);
 });
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use((err, req, res, next) => {
+  console.error(err); // <-- Affiche l'erreur complète dans la console
+  res.status(err.status || 500).json({ error: err.message });
+});
 
+setupSwagger(app);
 
 export default app
