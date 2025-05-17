@@ -22,15 +22,15 @@ const io = new Server(server, {
   }
 });
 
-// io.on('connection', (socket) => {
-//   logger.info(`Socket.IO: Client connected - ${socket.id}`);
+io.on('connection', (socket) => {
+  logger.info(`Socket.IO: Client connected - ${socket.id}`);
 
-//   socket.on('disconnect', () => {
-//     logger.info(`Socket.IO: Client disconnected - ${socket.id}`);
-//   });
-// });
+  socket.on('disconnect', () => {
+    logger.info(`Socket.IO: Client disconnected - ${socket.id}`);
+  });
+});
 
-// app.set('io', io);
+app.set('io', io);
 
 const startServer = async () => {
   try {
