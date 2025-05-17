@@ -22,7 +22,8 @@ app.use(morgan(morganFormat, { stream: winstonLogger.stream }));
 
 app.use(cors());
 app.use((req, res, next) => {
-  req.io = io;
+  const io = app.get('io');
+  if (io) req.io = io;
   next();
 });
 app.use(express.json());
