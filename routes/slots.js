@@ -54,6 +54,6 @@ router.get('/slots/mine', authenticate, getMyTimeSlots);
 // Client voit les créneaux d’un provider
 router.get('/slots/available', authenticate, getAvailableSlots);
 router.put('/slots/:id', authenticate, updateTimeSlot);
-router.delete("/slots/;id", authenticate, deleteTimeSlot);
+router.delete("/slots/:id", authenticate, deleteTimeSlot);
 
 export default router;
