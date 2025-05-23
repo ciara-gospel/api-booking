@@ -58,14 +58,19 @@ export const registerProvider = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Insertion utilisateur
     const userRes = await query(
       `INSERT INTO users (first_name, last_name, email, password)
          VALUES ($1, $2, $3, $4) RETURNING id`,
       [first_name, last_name, email, hashedPassword]
     );
 
-    const user_id = userRes.rows[0].id;
+    const user_id = userRes.rows[0]?.id;
+    if (!user_id) {
+      throw new Error("User ID not returned from insert.");
+    }
 
+    // Insertion du fournisseur de services
     const providerRes = await query(
       `INSERT INTO service_providers (user_id, service_name, email)
          VALUES ($1, $2, $3) RETURNING id`,
@@ -88,6 +93,7 @@ export const registerProvider = async (req, res) => {
       token,
     });
   } catch (err) {
+    console.error("Erreur lors de l'inscription du provider:", err); // LOG POUR DÉBOGAGE
     res.status(500).json({
       message: "Provider registration failed",
       error: err.message,
