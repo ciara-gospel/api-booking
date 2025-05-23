@@ -26,7 +26,6 @@ app.use(
   })
 );
 
-app.use(cors());
 app.use((req, res, next) => {
   const io = app.get("io");
   if (io) req.io = io;
