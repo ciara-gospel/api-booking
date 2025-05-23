@@ -77,8 +77,8 @@ const initializeDbSchema = async () => {
         await client.query(`
         CREATE TABLE IF NOT EXISTS service_providers (
            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-           userId UUID REFERENCES users(id) ON DELETE CASCADE, -- Link to users table
-           serviceName VARCHAR(100) NOT NULL,
+           user_id UUID REFERENCES users(id) ON DELETE CASCADE, -- Link to users table
+           service_name VARCHAR(100) NOT NULL,
            email VARCHAR(255) UNIQUE,
            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
