@@ -41,6 +41,12 @@ pool.on("error", (err, client) => {
 })
 
 const initializeDbSchema = async () => {
+
+    if (process.env.NODE_ENV === "production") {
+        logger.info("Skipping DB schema initialization in production");
+        return;
+      }
+
     const client = await pool.connect();
     try {
         logger.info("Initializing database schema...");
@@ -57,8 +63,8 @@ const initializeDbSchema = async () => {
         await client.query(`
         CREATE TABLE IF NOT EXISTS users (
            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-           firstName VARCHAR(100) NOT NULL,
-           lastName VARCHAR(100) NOT NULL,
+           first_name VARCHAR(100) NOT NULL,
+           last_name VARCHAR(100) NOT NULL,
            email VARCHAR(255) UNIQUE NOT NULL,
            password VARCHAR(255) NOT NULL,
            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

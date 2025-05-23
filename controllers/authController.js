@@ -7,6 +7,7 @@ const generateToken = (payload) =>
   jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
 
 export const registerUser = async (req, res) => {
+  console.log("Request body received:", req.body);
   const { first_name, last_name, email, password } = req.body;
   try {
     const existing = await query(`SELECT id FROM users WHERE email = $1`, [
