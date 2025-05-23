@@ -20,6 +20,11 @@ const __dirname = dirname(__filename)
 const morganFormat = process.env.NODE_ENV === "production" ? "dev" : 'combined'
 app.use(morgan(morganFormat, { stream: winstonLogger.stream }));
 
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+}));
+
 app.use(cors());
 app.use((req, res, next) => {
   const io = app.get('io');
@@ -45,7 +50,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err); // <-- Affiche l'erreur complète dans la console
+  console.error(err);
   res.status(err.status || 500).json({ error: err.message });
 });
 

@@ -1,4 +1,3 @@
-// controllers/authController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { query } from "../config/db.js";
@@ -10,7 +9,7 @@ const generateToken = (payload) =>
 export const registerUser = async (req, res) => {
     const { first_name, last_name, email, password } = req.body;
     try {
-      // Vérifie si l'email existe déjà
+
       const existing = await query(`SELECT id FROM users WHERE email = $1`, [email]);
       if (existing.rows.length > 0) {
         return res.status(400).json({ message: 'Email already in use' });
@@ -47,7 +46,7 @@ export const registerUser = async (req, res) => {
     }
   
     try {
-      // 🔍 Vérifie si l'utilisateur existe déjà
+
       const existingUser = await query(
         `SELECT id FROM users WHERE email = $1`,
         [email]
@@ -115,8 +114,7 @@ export const registerUser = async (req, res) => {
       const valid = await bcrypt.compare(password, user.password);
       if (!valid)
         return res.status(401).json({ message: "Invalid email or password" });
-  
-      // Vérifie s'il s'agit d'un provider
+
       const providerRes = await query(
         `SELECT id, service_name FROM service_providers WHERE user_id = $1`,
         [user.id]
