@@ -31,6 +31,7 @@ export const registerUser = async (req, res) => {
       user: {
         id: result.rows[0].id,
         email: result.rows[0].email,
+        role: "user",
       },
       token,
     });
@@ -90,6 +91,7 @@ export const registerProvider = async (req, res) => {
         first_name,
         email,
         service_name,
+        role: "provider",
       },
       token,
     });
