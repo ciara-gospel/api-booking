@@ -6,9 +6,9 @@ export const createTimeSlot = async (req, res) => {
   const user_id = req.user.id;
 
   if (!start_time || !duration_minutes) {
-    return res
-      .status(400)
-      .json({ message: "start_time and duration_minutes are required" });
+    return res.status(400).json({
+      message: "start_time and duration_minutes are required",
+    });
   }
 
   try {
@@ -27,8 +27,8 @@ export const createTimeSlot = async (req, res) => {
     const end = start.add(duration_minutes, "minute");
 
     const result = await query(
-      `INSERT INTO time_slots (provider_id, date, start_time, end_time, is_booked)
-       VALUES ($1, $2, $3, $4, false)
+      `INSERT INTO time_slots (provider_id, date, start_time, end_time, is_booked, published)
+       VALUES ($1, $2, $3, $4, false, false)
        RETURNING *`,
       [
         provider_id,
@@ -38,9 +38,7 @@ export const createTimeSlot = async (req, res) => {
       ]
     );
 
-    res
-      .status(201)
-      .json({ message: "Time slot created", slot: result.rows[0] });
+    res.status(201).json({ message: "Time slot created", slot: result.rows[0] });
   } catch (err) {
     console.error("Error in createTimeSlot:", err);
     res
@@ -92,6 +90,7 @@ export const getAvailableSlots = async (req, res) => {
       WHERE provider_id = $1
       AND date >= $2
       AND is_booked = false
+      AND published = true
     `;
     const params = [provider_id, start_date];
 
@@ -158,9 +157,7 @@ export const updateTimeSlot = async (req, res) => {
         .json({ message: "Time slot not found or not yours" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Time slot updated", slot: result.rows[0] });
+    res.status(200).json({ message: "Time slot updated", slot: result.rows[0] });
   } catch (err) {
     console.error("Error in updateTimeSlot:", err);
     res
@@ -204,5 +201,36 @@ export const deleteTimeSlot = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to delete time slot", error: err.message });
+  }
+};
+
+export const publishSlots = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const providerRes = await query(
+      `SELECT id FROM service_providers WHERE user_id = $1`,
+      [user_id]
+    );
+
+    if (providerRes.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized or not a provider" });
+    }
+
+    const provider_id = providerRes.rows[0].id;
+
+    await query(
+      `UPDATE time_slots SET published = true WHERE provider_id = $1`,
+      [provider_id]
+    );
+
+    res.status(200).json({ message: "All time slots published" });
+  } catch (err) {
+    console.error("Error in publishSlots:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to publish slots", error: err.message });
   }
 };
