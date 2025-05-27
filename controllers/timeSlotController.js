@@ -38,7 +38,9 @@ export const createTimeSlot = async (req, res) => {
       ]
     );
 
-    res.status(201).json({ message: "Time slot created", slot: result.rows[0] });
+    res
+      .status(201)
+      .json({ message: "Time slot created", slot: result.rows[0] });
   } catch (err) {
     console.error("Error in createTimeSlot:", err);
     res
@@ -63,9 +65,14 @@ export const getMyTimeSlots = async (req, res) => {
     const provider_id = providerRes.rows[0].id;
 
     const result = await query(
-      `SELECT * FROM time_slots WHERE provider_id = $1 ORDER BY date, start_time`,
+      `SELECT *, 
+        to_char(date, 'YYYY-MM-DD') || 'T' || start_time AS start_time_iso
+       FROM time_slots 
+       WHERE provider_id = $1 
+       ORDER BY date, start_time`,
       [provider_id]
     );
+
     res.status(200).json({ slots: result.rows });
   } catch (err) {
     console.error("Error in getMyTimeSlots:", err);
@@ -86,7 +93,9 @@ export const getAvailableSlots = async (req, res) => {
 
   try {
     let queryText = `
-      SELECT * FROM time_slots
+      SELECT *, 
+        to_char(date, 'YYYY-MM-DD') || 'T' || start_time AS start_time_iso
+      FROM time_slots
       WHERE provider_id = $1
       AND date >= $2
       AND is_booked = false
@@ -157,7 +166,9 @@ export const updateTimeSlot = async (req, res) => {
         .json({ message: "Time slot not found or not yours" });
     }
 
-    res.status(200).json({ message: "Time slot updated", slot: result.rows[0] });
+    res
+      .status(200)
+      .json({ message: "Time slot updated", slot: result.rows[0] });
   } catch (err) {
     console.error("Error in updateTimeSlot:", err);
     res
