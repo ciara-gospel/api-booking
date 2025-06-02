@@ -83,42 +83,56 @@ export const getMyTimeSlots = async (req, res) => {
 };
 
 export const getAvailableSlots = async (req, res) => {
-  const { provider_id, start_date, end_date } = req.query;
+  const { start_date, end_date, provider_id } = req.query;
 
-  if (!provider_id || !start_date) {
-    return res
-      .status(400)
-      .json({ message: "provider_id and start_date are required" });
+  if (!start_date) {
+    return res.status(400).json({
+      message: "start_date is required",
+    });
   }
 
   try {
     let queryText = `
-      SELECT *, 
-        to_char(date, 'YYYY-MM-DD') || 'T' || start_time AS start_time_iso
-      FROM time_slots
-      WHERE provider_id = $1
-      AND date >= $2
-      AND is_booked = false
-      AND published = true
+      SELECT 
+        ts.id,
+        sp.name AS provider_name,
+        s.name AS service_name,
+        ts.duration_minutes,
+        ts.is_booked,
+        ts.published,
+        (ts.date || 'T' || ts.start_time)::timestamp AS start_time
+      FROM time_slots ts
+      JOIN service_providers sp ON ts.provider_id = sp.id
+      JOIN services s ON s.provider_id = sp.id
+      WHERE ts.date >= $1
+        AND ts.is_booked = false
+        AND ts.published = true
     `;
-    const params = [provider_id, start_date];
+    const params = [start_date];
 
     if (end_date) {
-      queryText += ` AND date <= $3`;
+      queryText += ` AND ts.date <= $2`;
       params.push(end_date);
     }
 
-    queryText += ` ORDER BY date, start_time`;
+    if (provider_id) {
+      queryText += ` AND ts.provider_id = $${params.length + 1}`;
+      params.push(provider_id);
+    }
+
+    queryText += ` ORDER BY ts.date, ts.start_time`;
 
     const result = await query(queryText, params);
     res.status(200).json({ available_slots: result.rows });
   } catch (err) {
     console.error("Error in getAvailableSlots:", err);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch available slots", error: err.message });
+    res.status(500).json({
+      message: "Failed to fetch available slots",
+      error: err.message,
+    });
   }
 };
+
 
 export const updateTimeSlot = async (req, res) => {
   const user_id = req.user.id;
